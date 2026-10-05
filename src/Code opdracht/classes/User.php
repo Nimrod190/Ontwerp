@@ -43,36 +43,63 @@
             return $errors;
         }
 
-        function validateUser(){
-            $errors=[];
+       function validateUser(): array
+   {
+    $errors = [];
 
-            if (empty($this->username)){
-                array_push($errors, "Invalid username");
-            } else if (empty($this->password)){
-                array_push($errors, "Invalid password");
-            }
+    if (empty($this->username)) {
+        array_push($errors, "Invalid username");
+    } elseif (strlen($this->username) < 3 || strlen($this->username) > 50) {
+        array_push($errors, "Username moet tussen 3 en 50 tekens zijn.");
+    }
 
-            // Test username > 3 tekens
-            
-            return $errors;
-        }
+    if (empty($this->password)) {
+        array_push($errors, "Invalid password");
+    }
 
-        public function loginUser(): bool {
-
-
-
-            // Connect database
-            $conn =
-
-            // Zoek user in de table user met username = $this->username
-            // Doe SELECT * from user WHERE username = $this->username
+    return $errors;
+   }
 
 
-            // Indien gevonden EN password klopt dan sessie vullen
 
-            // Return true indien gelukt anders false
-            return true;
-        }
+ public function loginUser(): bool
+{
+    global $pdo;
+
+    // Connect database
+
+    // Zoek user in de table user met username = $this->username
+    $sql = "SELECT * FROM user WHERE username = :username";
+
+    $statement = $pdo->prepare($sql);
+
+    $statement->execute([
+        'username' => $this->username
+    ]);
+
+    $user = $statement->fetch(PDO::FETCH_ASSOC);
+
+    // Indien niet gevonden
+    if ($user === false) {
+        return false;
+    }
+
+    // Indien gevonden EN password klopt dan sessie vullen
+    if (!password_verify($this->password, $user['password'])) {
+        return false;
+    }
+
+    $_SESSION['userId'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+
+    // Return true indien gelukt anders false
+    return true;
+}
+
+
+
+
+
 
         // Check if the user is already logged in
         public function isLoggedin(): bool {
@@ -107,10 +134,15 @@
         public function ConnectDb(){
 
 
-         include"//config.php";
          
-         }
+    include __DIR__ . "/../config.php";
 
+    return $conn;
+         
+
+
+
+         }
 
 
     }
