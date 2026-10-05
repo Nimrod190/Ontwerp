@@ -59,7 +59,10 @@
 
         public function loginUser(): bool {
 
+
+
             // Connect database
+            $conn =
 
             // Zoek user in de table user met username = $this->username
             // Doe SELECT * from user WHERE username = $this->username
@@ -101,8 +104,20 @@
             
 
         }
+        public function ConnectDb(){
+
+
+         include"//config.php";
+         
+         }
+
 
 
     }
+
+
+
+
+
 
 ?>
