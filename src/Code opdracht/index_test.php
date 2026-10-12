@@ -1,8 +1,10 @@
 <?php
     // Functie: programma login OOP 
-    // Auteur: Studentnaam
+    // Auteur: Nimrod
 
     // Initialisatie
+
+    
     include 'classes/User.php';
 
     //Main

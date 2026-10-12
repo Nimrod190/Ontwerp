@@ -1,44 +1,41 @@
 <?php
-	// Functie: programma login OOP 
-    // Auteur: Studentnaam
-	require_once('classes/User.php');
+require_once('classes/User.php');
 
-	$user = new User();
-	$errors=[];
+$user = new User();
+$errors = [];
 
-	// Is de register button aangeklikt?
-	if(isset($_POST['register-btn'])){
-		
-		// Gegevens uit formulier halen
-		$user->username = $_POST['username'];
-		$user->setPassword($_POST['password']);
+// Is de register button aangeklikt?
+if(isset($_POST['register-btn'])){
 
-		// Validatie gegevens
-		// Hoe???
+    // Gegevens uit formulier halen
+    $user->username = $_POST['username'];
+    $user->setPassword($_POST['password']);
 
-		// Test of er geen errors zijn
-		if(count($errors) == 0){
-			// Register user
-			$errors = $user->registerUser();
-		}
-		
-		if(count($errors) > 0){
-			$message = "";
-			foreach ($errors as $error) {
-				$message .= $error . "\\n";
-			}
-			
-			echo "
-			<script>alert('" . $message . "')</script>
-			<script>window.location = 'register_form.php'</script>";
-		
-		} else {
-			echo "
-				<script>alert('" . "User registerd" . "')</script>
-				<script>window.location = 'login_form.php'</script>";
-		}
+    // Validatie gegevens
+    $errors = $user->validateUser();
 
-	}
+    // Test of er geen errors zijn
+    if(count($errors) == 0){
+        // Register user
+        $errors = $user->registerUser();
+    }
+
+    if(count($errors) > 0){
+        $message = "";
+
+        foreach ($errors as $error) {
+            $message .= $error . "\n";
+        }
+
+        echo "
+        <script>alert('" . $message . "')</script>
+        <script>window.location='register_form.php'</script>";
+    } else {
+        echo "
+        <script>alert('User registered')</script>
+        <script>window.location='login_form.php'</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>

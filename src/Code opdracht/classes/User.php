@@ -1,6 +1,6 @@
 <?php
     // Functie: classdefinitie User 
-    // Auteur: Studentnaam
+    // Auteur: Nimrod
 
     class User{
 
@@ -24,24 +24,41 @@
         }
 
         public function registerUser() : array {
-            $status = false;
-            $errors=[];
-            if($this->username != ""){
+    $errors = [];
 
-                // Check user exist in database
-                
-                if(true){
-                    array_push($errors, "Username bestaat al.");
-                } else {
-                    // username opslaan in tabel login
-                    // INSERT INTO `user` (`username`, `password`, `role`) VALUES ('kjhasdasdkjhsak', 'asdasdasdasdas', '');
-                    // Manier 1
-                    
-                    $status = true;
-                } 
-            }
-            return $errors;
+    if($this->username != ""){
+
+        // Connect database
+        $conn = $this->dbConnect();
+
+        // Check user exist in database
+        $sql = "SELECT * FROM user WHERE username = :username";
+
+        $statement = $conn->prepare($sql);
+        $statement->execute([
+            'username' => $this->username
+        ]);
+
+        if($statement->rowCount() > 0){
+
+            array_push($errors, "Username bestaat al.");
+
+        } else {
+
+            $sql = "INSERT INTO user (username, password)
+                    VALUES (:username, :password)";
+
+            $statement = $conn->prepare($sql);
+
+            $statement->execute([
+                'username' => $this->username,
+                'password' => password_hash($this->getPassword(), PASSWORD_DEFAULT)
+            ]);
         }
+    }
+
+    return $errors;
+}
 
        function validateUser(): array
    {
@@ -62,16 +79,14 @@
 
 
 
- public function loginUser(): bool
+public function loginUser(): bool
 {
-    global $pdo;
+    // Maak verbinding met de database
+    $conn = $this->dbConnect();
 
-    // Connect database
-
-    // Zoek user in de table user met username = $this->username
-    $sql = "SELECT * FROM user WHERE username = :username";
-
-    $statement = $pdo->prepare($sql);
+    // Zoek de gebruiker op via de username
+    $sql = "SELECT * FROM `user` WHERE username = :username";
+    $statement = $conn->prepare($sql);
 
     $statement->execute([
         'username' => $this->username
@@ -79,35 +94,45 @@
 
     $user = $statement->fetch(PDO::FETCH_ASSOC);
 
-    // Indien niet gevonden
+    // Gebruiker niet gevonden
     if ($user === false) {
         return false;
     }
 
-    // Indien gevonden EN password klopt dan sessie vullen
+    // Controleer het wachtwoord
     if (!password_verify($this->password, $user['password'])) {
         return false;
+    }
+
+    // Start de sessie indien nodig
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
 
     $_SESSION['userId'] = $user['id'];
     $_SESSION['username'] = $user['username'];
 
-    // Return true indien gelukt anders false
     return true;
 }
 
 
 
-
-
-
-        // Check if the user is already logged in
         public function isLoggedin(): bool {
-            // Check if user session has been set
-            
-            return false;
-        }
 
+            if(session_status() == PHP_SESSION_NONE){
+             session_start();
+    }
+
+
+  
+
+
+
+
+
+
+    return isset($_SESSION['userId']);
+}
         public function getUser(string $username): bool {
             // Connect database
 
@@ -122,45 +147,48 @@
             }   
         }
 
-        public function logout(){
-            session_start();
-            // remove all session variables
-           
 
-            // destroy the session
-            
-
-        }
-        public function ConnectDb(){
-
-
-         
+        public function dbConnect()
+{
     include __DIR__ . "/../config.php";
 
-    
-try {
-  $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-  // set the PDO error mode to exception
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  echo "Connected successfully";
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
+    try {
+        $conn = new PDO(
+            "mysql:host=$servername;dbname=$dbname",
+            $username,
+            $password
+        );
+
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        return $conn;
+
+    } catch(PDOException $e) {
+        die("Connection failed: " . $e->getMessage());
+    }
+}
+
+ public function logout(){
+
+    session_start();
+
+    session_unset();
+
+    session_destroy();
 }
 
 
-    return $conn;
-         
 
 
 
-         }
 
 
-    }
-
-
-
+} 
 
 
 
 ?>
+
+
+
+

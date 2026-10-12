@@ -1,8 +1,9 @@
 <?php
     // Functie: programma login OOP 
-    // Auteur: Studentnaam
+    // Auteur: Nimrod
 
     // Initialisatie
+	 
 	require_once 'classes/User.php';
 	
 	$user = new User();
