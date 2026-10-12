@@ -124,15 +124,13 @@ public function loginUser(): bool
     }
 
 
-  
-
-
-
-
-
-
     return isset($_SESSION['userId']);
+
+
 }
+
+
+
         public function getUser(string $username): bool {
             // Connect database
 
@@ -170,15 +168,14 @@ public function loginUser(): bool
 
  public function logout(){
 
-    session_start();
+    if(session_status() == PHP_SESSION_NONE){
+        session_start();
+    }
 
     session_unset();
 
     session_destroy();
 }
-
-
-
 
 
 
