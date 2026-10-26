@@ -149,12 +149,15 @@ public function loginUser(): bool
         public function dbConnect()
 {
     include __DIR__ . "/../config.php";
+    $dbname = DATABASE;
+    $servername= SERVERNAME;
+
 
     try {
         $conn = new PDO(
             "mysql:host=$servername;dbname=$dbname",
-            $username,
-            $password
+            USERNAME,
+            PASSWORD
         );
 
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
